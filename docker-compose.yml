@@ -1,37 +1,38 @@
-version: "3.7"
+version: '3.7'
 services:
-  codebox:
-    build: 
-      dockerfile: Dockerfile
-      context: .devcontainer
+  
+  play-with-docker:
+    container_name: play-with-docker
+    image: docker/getting-started:pwd
     ports:
-      - 80:5000 
-    depends_on:
-      - db
-    links:
-      - db
-  #app:
-  #  build: your/folder
-  #  ports:
-  #    - 80:80
-  db:
-    environment:
-      ACCEPT_EULA: "Y"
-      SA_PASSWORD: example_123
-    image: mcr.microsoft.com/mssql/server
-    restart: always
-    healthcheck:
-        test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P example_123 -Q 'SELECT 1' || exit 1"]
-        interval: 10s
-        retries: 10
-        start_period: 10s
-        timeout: 3s     
+      - 8080:80
 
-# Commands
-# git clone https://github.com/stvansolano/codebox-dotnet.git
-# cd codebox-dotnet
-# docker-compose up -d --build
-# docker exec -it <CONTAINER> bash
-# dotnet new webapi --name MyWebApi
-# cd MyWebApi
-# dotnet run --urls "http://*:5000"
+  adventure-works-db-sql-server:
+    image: stvansolano/adventure-works:latest
+    environment:
+      SA_PASSWORD: "Password.123"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+
+  dotnet-frontend:
+    build:
+      context: .
+      dockerfile: material/Frontend/Dockerfile
+    ports:
+    - "80:80"
+    environment:
+      -  ASPNETCORE_URLS=http://+:80
+  
+  dotnet-backend:
+    build:
+      context: .
+      dockerfile: material/ProductsApi/Dockerfile
+    ports:
+    - "6001:5000"
+    links:
+    - adventure-works-db-sql-server
+    depends_on:
+    - adventure-works-db-sql-server
+
+# docker-compose up -d
