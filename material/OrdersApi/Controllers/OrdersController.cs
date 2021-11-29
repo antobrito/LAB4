@@ -40,8 +40,8 @@ namespace OrdersApi.Controllers
 
             //llamamos al API de productos desde orders
             //recibimos un json
-            var json = await httpClient.GetStringAsync("/Products"); // me traigo to todos los products
-
+           // var json = await httpClient.GetStringAsync("/Products"); // me traigo to todos los products
+            var json = await httpClient.GetStringAsync(Services.ProductsSvc + "/products");
             var products = JsonConvert.DeserializeObject<JArray>(json);
 
             //traemos los productos y lo pnemos en un arreglo
